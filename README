@@ -1,0 +1,31 @@
+#########################
+# VERY IMPORTANT        ##################################
+# THE SCRIPT REQUIRES PRE-CONFIGURATION PRIOR TO RUNNING #
+###########################################################
+
+#####################################################################
+# The purpose of this script is
+# to generate a mixed media html report.
+#
+# This script does the following:
+# 1. Downloads Consumer Complaint
+#    data from the CFPB website.
+#
+# 2. Download income data from ACS
+#
+# 3. Download geography information
+#
+# 4. Loads the data into a SQLite database, and then
+#
+# 5. Performs a variety of analytical processing to
+#    associate and identify relationship among the data.
+#
+# 6. The output of the processing is summarized in report.html
+####################################################################
+# By: Oswald Constable   Date: 9/25/2016
+####################################################################
+
+#########################
+# VERY IMPORTANT        ##################################
+# THE SCRIPT REQUIRES PRE-CONFIGURATION PRIOR TO RUNNING #
+###########################################################
