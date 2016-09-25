@@ -31,7 +31,7 @@
 MODE="PROD"
 
 # Specify the path to the sqlite binary
-SQLBIN="/homepoconstab/Downloads/sqlite/bin/sqlite3"
+SQLBIN="/home/oconstab/Downloads/sqlite/bin/sqlite3"
 
 # Specify the path to the data storage directory where the complaints
 # and income data will be stored.
@@ -47,7 +47,6 @@ DATAURL3="http://www2.census.gov/acs2013_5yr/summaryfile/2009-2013_ACSSF_By_Stat
 #####################################################################
 # END CONFIGURATION
 #####################################################################
-
 
 #####################################################################
 # DO NOT MODIFY ANYTHING BELOW THIS POINT
@@ -115,6 +114,13 @@ cat m_header.csv m20135us0015000.txt > m20135us0015000WithHDR.csv
 cat g_header.csv g20135us.csv > g20135usWithHDR.csv
 
 echo "Added headers..."
+echo "Resetting SQLite database. Errors can be ignored..."
+
+echo -e 'DROP TABLE complaint;' | $SQLBIN "reportdb"
+echo -e 'DROP TABLE geo;' | $SQLBIN "reportdb"
+echo -e 'DROP TABLE mincome;' | $SQLBIN "reportdb"
+echo -e 'DROP TABLE eincome;' | $SQLBIN "reportdb"
+echo -e 'DROP TABLE complaint_blend;' | $SQLBIN "reportdb"
 
 echo "Starting SQLite data import..."
 
@@ -134,21 +140,22 @@ echo "Completed SQLite data import..."
 
 echo "Blending data..."
 
-echo -e 'CREATE TABLE complaint_blend as select C.*, G.*, I.B06010_004, I.B06010_i005, I.B06010_006, I.B06010_007, I.B06010_008  from complaint C left outer join geo G on C.[ZIP Code] = G.ZCTA5 left outer join mincome I on G.LOGRECNO = I.LOGRECNO;' | $SQLBIN "reportdb"
+echo -e 'CREATE TABLE complaint_blend as select C.*, I.B06010_004, I.B06010_005, I.B06010_006, I.B06010_007, I.B06010_008  from complaint C left outer join geo G on C.[ZIP Code] = G.ZCTA5 left outer join mincome I on G.LOGRECNO = I.LOGRECNO limit 10000;' | $SQLBIN "reportdb"
 
+echo -e 'select count(*), [ZIP code] || "<hr>" from complaint_blend group by [ZIP code] order by 1 desc;' | $SQLBIN "reportdb" > report_body.txt
 
-echo -e 'select count(*), [ZIP code] from complaint_blend group by [ZIP code];' | SQLBIN "reportdb" > report_body.txt
-
-echo "<html><body><h1>Frequency of complaints by Zip Code</h1><br>" > report_header.txt
+echo "<html><body><h1>Frequency of Complaints by Zip Code</h1><br>" > report_header.txt
 echo "</body></html>" > report_footer.txt
 
 cat report_header.txt report_body.txt report_footer.txt > report.html
 
-echo "Report Completed. See report.html for output"
+
+echo "Report Completed. See $DATADIR/report.html for output"
 
 ######################
 # END MAIN SCRIPT BODY
 ######################
+
 
 cd $WORKDIR
 
